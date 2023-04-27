@@ -24,9 +24,7 @@ public class DocumentScanner {
         String image = "receipt.jpg"; //scanner.nextLine();
 
         Mat imgMatrix = loadImage(image);
-        Mat greyscaled = toGreyScale(imgMatrix);
-        Mat denoised = removeNoise(greyscaled);
-        Mat cannied = cannyEdge(denoised);
+        Mat cannied = cannyProcess(imgMatrix);
         saveImage(cannied, image);
     }
     
@@ -46,6 +44,12 @@ public class DocumentScanner {
         Mat canny = new Mat(img.rows(), img.cols(), img.type());
         Imgproc.Canny(img, canny, 75, 200);
         return canny;
+    }
+    
+    public static Mat cannyProcess(Mat img) {
+        Mat edges = toGreyScale(img);
+        edges = removeNoise(edges);
+        return cannyEdge(edges);
     }
 
     public static Mat loadImage(String imgName) {
