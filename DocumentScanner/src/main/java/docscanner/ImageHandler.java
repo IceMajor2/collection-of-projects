@@ -9,6 +9,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -51,10 +52,10 @@ public class ImageHandler {
         imgCodecs.imwrite(file.getAbsolutePath(), imageMatrix);
     }
     
-    public static List<MatOfPoint> largestContours(Mat cannyEdged) {
+    public static List<MatOfPoint> largestContours(Mat img) {
         List<MatOfPoint> contours = new ArrayList<>();
         Mat ranking = new Mat();
-        Imgproc.findContours(cannyEdged, contours, ranking,
+        Imgproc.findContours(img, contours, ranking,
                 Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
         // sort: biggest area first
         contours.sort((c1, c2) -> {
@@ -64,7 +65,7 @@ public class ImageHandler {
         return contours.subList(0, 5);
     }
     
-    public static Mat documentContour(List<MatOfPoint> contours) {
+    public static MatOfPoint documentContour(List<MatOfPoint> contours) {
         MatOfPoint2f documentCnt = null;
         
         for(var cont : contours) {
@@ -75,7 +76,7 @@ public class ImageHandler {
             
             // approximate contour
             double perimeter = Imgproc.arcLength(cont2f, true);
-            MatOfPoint2f approxCnt = null;
+            MatOfPoint2f approxCnt = new MatOfPoint2f();
             Imgproc.approxPolyDP(cont2f, approxCnt, 0.02 * perimeter, true);
             
             if(approxCnt.toList().size() == 4) {
@@ -83,6 +84,21 @@ public class ImageHandler {
                 break;
             }
         }
-        return documentCnt;
+        // lastly convert MOP2f back to MOP
+        MatOfPoint docMOP = new MatOfPoint();
+        try {
+            documentCnt.convertTo(docMOP, CvType.CV_32S);
+        } catch(NullPointerException e) {
+            System.out.println("ERROR: Did not detect document on the picture.");
+        }
+        return docMOP;
+    }
+    
+    public static void drawBorder(Mat img, MatOfPoint contour) {
+       // Mat drawnPic = new Mat();
+       // img.copyTo(drawnPic);
+        
+        Imgproc.drawContours(img, List.of(contour),
+                -1, new Scalar(0, 255, 0), 2);
     }
 }
