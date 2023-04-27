@@ -5,6 +5,7 @@ import java.util.Scanner;
 import nu.pattern.OpenCV;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 import static java.io.File.separator;
 
 public class DocumentScanner {
@@ -12,13 +13,24 @@ public class DocumentScanner {
     public static final String RESOURCES_PATH = String.format("src%smain%sresources%s",
             separator, separator, separator);
 
-    public static void main(String[] args) {
+    static {
         OpenCV.loadLocally();
+    }
+
+    public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
         String image = "receipt.jpg"; //scanner.nextLine();
-        
+
         Mat imgMatrix = loadImage(image);
-        saveImage(imgMatrix, "receipt.jpg");
+        Mat greyscaled = toGreyScale(imgMatrix);
+        saveImage(greyscaled, image);
+    }
+
+    public static Mat toGreyScale(Mat img) {
+        Mat greyscaled = new Mat();
+        Imgproc.cvtColor(img, greyscaled, Imgproc.COLOR_RGB2GRAY);
+        return greyscaled;
     }
 
     public static Mat loadImage(String imgName) {
