@@ -5,8 +5,10 @@ import java.io.File;
 import static java.io.File.separator;
 import java.util.ArrayList;
 import java.util.List;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -49,7 +51,7 @@ public class ImageHandler {
         imgCodecs.imwrite(file.getAbsolutePath(), imageMatrix);
     }
     
-    public static List<MatOfPoint> contours(Mat cannyEdged) {
+    public static List<MatOfPoint> largestContours(Mat cannyEdged) {
         List<MatOfPoint> contours = new ArrayList<>();
         Mat ranking = new Mat();
         Imgproc.findContours(cannyEdged, contours, ranking,
@@ -60,5 +62,27 @@ public class ImageHandler {
                     .compareTo(Imgproc.contourArea(c1));
         });
         return contours.subList(0, 5);
+    }
+    
+    public static Mat documentContour(List<MatOfPoint> contours) {
+        MatOfPoint2f documentCnt = null;
+        
+        for(var cont : contours) {
+            // getting MOP2f because the latter 'arcLength' method works only
+            // with 2f type
+            MatOfPoint2f cont2f = new MatOfPoint2f();
+            cont.convertTo(cont2f, CvType.CV_32F);
+            
+            // approximate contour
+            double perimeter = Imgproc.arcLength(cont2f, true);
+            MatOfPoint2f approxCnt = null;
+            Imgproc.approxPolyDP(cont2f, approxCnt, 0.02 * perimeter, true);
+            
+            if(approxCnt.toList().size() == 4) {
+                documentCnt = approxCnt;
+                break;
+            }
+        }
+        return documentCnt;
     }
 }

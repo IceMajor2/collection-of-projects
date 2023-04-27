@@ -20,6 +20,5 @@ public class DocumentScanner {
         Mat imgMatrix = ImageHandler.loadImage(image);
         Mat cannied = ImageHandler.cannyEdgeProcess(imgMatrix);
         ImageHandler.saveImage(cannied, image);
-        var cnts = ImageHandler.contours(cannied);
     }
 }
