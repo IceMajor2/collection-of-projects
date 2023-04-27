@@ -7,6 +7,7 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import static java.io.File.separator;
+import org.opencv.core.Size;
 
 public class DocumentScanner {
 
@@ -24,7 +25,14 @@ public class DocumentScanner {
 
         Mat imgMatrix = loadImage(image);
         Mat greyscaled = toGreyScale(imgMatrix);
-        saveImage(greyscaled, image);
+        Mat denoised = removeNoise(greyscaled);
+        saveImage(denoised, image);
+    }
+    
+    public static Mat removeNoise(Mat img) {
+        Mat blurred = new Mat(img.rows(), img.cols(), img.type());
+        Imgproc.GaussianBlur(img, blurred, new Size(5, 5), 0);
+        return blurred;
     }
 
     public static Mat toGreyScale(Mat img) {
