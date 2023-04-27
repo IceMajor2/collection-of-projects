@@ -1,0 +1,7 @@
+1. Determining the shape
+
+	When knowing the position of all of the edges, we know the whole document's area (given it's not been ripped) on a given image.
+
+2. Transform
+
+	Using a library, the previous document should now be processed to the bird's eye view and maybe resized, too.
