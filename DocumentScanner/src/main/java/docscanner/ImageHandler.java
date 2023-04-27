@@ -59,6 +59,6 @@ public class ImageHandler {
             return Double.valueOf(Imgproc.contourArea(c2))
                     .compareTo(Imgproc.contourArea(c1));
         });
-        return contours.subList(0, 4);
+        return contours.subList(0, 5);
     }
 }
