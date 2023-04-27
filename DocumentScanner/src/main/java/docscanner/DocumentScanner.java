@@ -26,7 +26,8 @@ public class DocumentScanner {
         Mat imgMatrix = loadImage(image);
         Mat greyscaled = toGreyScale(imgMatrix);
         Mat denoised = removeNoise(greyscaled);
-        saveImage(denoised, image);
+        Mat cannied = cannyEdge(denoised);
+        saveImage(cannied, image);
     }
     
     public static Mat removeNoise(Mat img) {
@@ -39,6 +40,12 @@ public class DocumentScanner {
         Mat greyscaled = new Mat();
         Imgproc.cvtColor(img, greyscaled, Imgproc.COLOR_RGB2GRAY);
         return greyscaled;
+    }
+    
+    public static Mat cannyEdge(Mat img) {
+        Mat canny = new Mat(img.rows(), img.cols(), img.type());
+        Imgproc.Canny(img, canny, 75, 200);
+        return canny;
     }
 
     public static Mat loadImage(String imgName) {
