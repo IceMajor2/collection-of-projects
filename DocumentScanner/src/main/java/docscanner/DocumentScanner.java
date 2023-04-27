@@ -17,8 +17,9 @@ public class DocumentScanner {
         //Scanner scanner = new Scanner(System.in);
         String image = "receipt.jpg"; //scanner.nextLine();
 
-        Mat imgMatrix = ImageEdgeGetter.loadImage(image);
-        Mat cannied = ImageEdgeGetter.cannyEdgeProcess(imgMatrix);
-        ImageEdgeGetter.saveImage(cannied, image);
+        Mat imgMatrix = ImageHandler.loadImage(image);
+        Mat cannied = ImageHandler.cannyEdgeProcess(imgMatrix);
+        ImageHandler.saveImage(cannied, image);
+        ImageHandler.contours(cannied);
     }
 }
