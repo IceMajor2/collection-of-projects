@@ -29,3 +29,9 @@ public class DocumentScanner {
         ImageHandler.saveImage(cannied, "receipt-cannied.jpg");
     }
 }
+
+/* TODO:
+-   work on the "documentContour" alghoritm. It does not detect imperfect
+    images. When the contour's is not totally smooth, then most likely
+    it won't work. Maybe SMOOTHEN the image/all contours further?
+*/
