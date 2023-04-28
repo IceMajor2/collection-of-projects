@@ -104,10 +104,10 @@ public class ImageHandler {
                 -1, new Scalar(0, 255, 0), 2);
     }
     
-    public static Point[] orderPoints(MatOfPoint contour) {
+    public static Point[] orderPoints(MatOfPoint unordered) {
         // contour needs to have precisely FOUR points
         Point[] pts = new Point[4];
-        var fourPointList = contour.toList();
+        var fourPointList = unordered.toList();
         // sorting contour's points by their distance from x, y 0 point
         // biggest distance is first
         fourPointList.sort((p1, p2) -> {
@@ -127,5 +127,19 @@ public class ImageHandler {
         pts[1] = fourPointList.get(3);
         pts[2] = fourPointList.get(0);
         return pts;
+    }
+    
+    public static Point[] orderPoints(Point[] unordered) {
+        List<Point> unorderedList = new ArrayList<>();
+        for(Point pt: unordered) {
+            unorderedList.add(pt);
+        }
+        MatOfPoint matrixOfPoints = new MatOfPoint();
+        matrixOfPoints.fromList(unorderedList);
+        return orderPoints(matrixOfPoints);
+    }
+    
+    public static void transformRectangle(Mat imgMatrix, Point[] edges) {
+        
     }
 }
