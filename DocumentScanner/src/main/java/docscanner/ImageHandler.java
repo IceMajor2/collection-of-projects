@@ -4,6 +4,7 @@ import static docscanner.DocumentScanner.RESOURCES_PATH;
 import java.io.File;
 import static java.io.File.separator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -130,10 +131,7 @@ public class ImageHandler {
     }
     
     public static Point[] orderPoints(Point[] unordered) {
-        List<Point> unorderedList = new ArrayList<>();
-        for(Point pt: unordered) {
-            unorderedList.add(pt);
-        }
+        List<Point> unorderedList = Arrays.asList(unordered);
         MatOfPoint matrixOfPoints = new MatOfPoint();
         matrixOfPoints.fromList(unorderedList);
         return orderPoints(matrixOfPoints);
