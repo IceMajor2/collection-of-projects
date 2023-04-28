@@ -23,7 +23,7 @@ public class ImageHandler {
         return blurred;
     }
 
-    private static Mat toGreyScale(Mat img) {
+    public static Mat toGreyScale(Mat img) {
         Mat greyscaled = new Mat();
         Imgproc.cvtColor(img, greyscaled, Imgproc.COLOR_RGB2GRAY);
         return greyscaled;
@@ -33,6 +33,16 @@ public class ImageHandler {
         Mat canny = new Mat(img.rows(), img.cols(), img.type());
         Imgproc.Canny(img, canny, 75, 200);
         return canny;
+    }
+
+    public static Mat blackAndWhiteFeel(Mat src) {
+        Mat blAndWh = new Mat(src.rows(), src.cols(), src.type());
+        Imgproc.adaptiveThreshold(src, blAndWh, 255,
+                Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
+                9, 10);
+        return blAndWh;
+        // ​(Mat src, Mat dst, double maxValue, int adaptiveMethod,
+        // int thresholdType, int blockSize, double C)
     }
 
     public static Mat cannyEdgeProcess(Mat img) {
@@ -65,13 +75,13 @@ public class ImageHandler {
         });
         return contours.subList(0, 5);
     }
-    
+
     private static MatOfPoint2f convertTo2f(MatOfPoint mat) {
         MatOfPoint2f mat2f = new MatOfPoint2f();
         mat.convertTo(mat2f, CvType.CV_32F);
         return mat2f;
     }
-    
+
     private static MatOfPoint convertTo0f(MatOfPoint2f mat) {
         MatOfPoint mat0f = new MatOfPoint();
         mat.convertTo(mat0f, CvType.CV_32S);
@@ -160,7 +170,9 @@ public class ImageHandler {
                 new Point(0, outHeight - 1),
                 new Point(outWidth - 1, outHeight - 1));
 
+        // getting transformation matrix
         Mat perspective = Imgproc.getPerspectiveTransform(ordered2f, dst2f);
+        // performing the transformation
         Mat warped = new Mat();
         Imgproc.warpPerspective(imgMatrix, warped, perspective,
                 new Size(outWidth, outHeight));

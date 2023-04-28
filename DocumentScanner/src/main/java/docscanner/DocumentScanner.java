@@ -19,11 +19,15 @@ public class DocumentScanner {
         // get canny
         Mat src = ImageHandler.loadImage(imgName);
         Mat canny = ImageHandler.cannyEdgeProcess(src);
-        ImageHandler.saveImage(canny, "canny-receipt.jpg");
+        //ImageHandler.saveImage(canny, "chall3.jpg");
         
         // get document's contour
         var bigCnts = ImageHandler.largestContours(canny);
         var docCnt = ImageHandler.documentContour(bigCnts);
+        
+        if(docCnt == null) {
+            return;
+        }
         
         // draw a border along the doc's countour
         // ImageHandler.drawBorder(src, docCnt);
@@ -31,7 +35,11 @@ public class DocumentScanner {
         
         // transform perspective -> get bird's eye view
         Mat transformed = ImageHandler.transformRectangle(src, docCnt);
-        ImageHandler.saveImage(transformed, "transf-receipt.jpg");
+        
+        Mat tfGreyScale = ImageHandler.toGreyScale(transformed);
+        Mat tresholdMatrix = ImageHandler.blackAndWhiteFeel(tfGreyScale);
+        
+        ImageHandler.saveImage(tresholdMatrix, "product.jpg");
     }
 }
 
