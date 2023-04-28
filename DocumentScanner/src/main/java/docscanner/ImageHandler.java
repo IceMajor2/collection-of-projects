@@ -17,7 +17,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 public class ImageHandler {
-    
+
     private static Mat removeNoise(Mat img) {
         Mat blurred = new Mat(img.rows(), img.cols(), img.type());
         Imgproc.GaussianBlur(img, blurred, new Size(5, 5), 0);
@@ -29,13 +29,13 @@ public class ImageHandler {
         Imgproc.cvtColor(img, greyscaled, Imgproc.COLOR_RGB2GRAY);
         return greyscaled;
     }
-    
+
     private static Mat toCannyEdge(Mat img) {
         Mat canny = new Mat(img.rows(), img.cols(), img.type());
         Imgproc.Canny(img, canny, 75, 200);
         return canny;
     }
-    
+
     public static Mat cannyEdgeProcess(Mat img) {
         Mat edges = toGreyScale(img);
         edges = removeNoise(edges);
@@ -53,7 +53,7 @@ public class ImageHandler {
         File file = new File(RESOURCES_PATH + "out" + separator + imgName);
         imgCodecs.imwrite(file.getAbsolutePath(), imageMatrix);
     }
-    
+
     public static List<MatOfPoint> largestContours(Mat img) {
         List<MatOfPoint> contours = new ArrayList<>();
         Mat ranking = new Mat();
@@ -66,22 +66,22 @@ public class ImageHandler {
         });
         return contours.subList(0, 5);
     }
-    
+
     public static MatOfPoint documentContour(List<MatOfPoint> contours) {
         MatOfPoint2f documentCnt = null;
-        
-        for(var cont : contours) {
+
+        for (var cont : contours) {
             // getting MOP2f because the latter 'arcLength' method works only
             // with 2f type
             MatOfPoint2f cont2f = new MatOfPoint2f();
             cont.convertTo(cont2f, CvType.CV_32F);
-            
+
             // approximate contour
             double perimeter = Imgproc.arcLength(cont2f, true);
             MatOfPoint2f approxCnt = new MatOfPoint2f();
             Imgproc.approxPolyDP(cont2f, approxCnt, 0.02 * perimeter, true);
 
-            if(approxCnt.toList().size() == 4) {
+            if (approxCnt.toList().size() == 4) {
                 documentCnt = approxCnt;
                 break;
             }
@@ -90,21 +90,21 @@ public class ImageHandler {
         MatOfPoint docMOP = new MatOfPoint();
         try {
             documentCnt.convertTo(docMOP, CvType.CV_32S);
-        } catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             System.out.println("ERROR: Did not detect document on the picture.");
             docMOP = null;
         }
         return docMOP;
     }
-    
+
     public static void drawBorder(Mat img, MatOfPoint contour) {
-       // Mat drawnPic = new Mat();
-       // img.copyTo(drawnPic);
-        
+        // Mat drawnPic = new Mat();
+        // img.copyTo(drawnPic);
+
         Imgproc.drawContours(img, List.of(contour),
                 -1, new Scalar(0, 255, 0), 2);
     }
-    
+
     public static Point[] orderPoints(MatOfPoint unordered) {
         // contour needs to have precisely FOUR points
         Point[] pts = new Point[4];
@@ -118,7 +118,7 @@ public class ImageHandler {
         });
         pts[0] = fourPointList.get(3); // top-left point (x + y is smallest)
         pts[3] = fourPointList.get(0); // bottom-right point (x + y is largest)
-        
+
         // same as previously, but now calculating the diff between x and y
         fourPointList.sort((p1, p2) -> {
             double xyDiff01 = p1.x - p1.y;
@@ -129,15 +129,47 @@ public class ImageHandler {
         pts[2] = fourPointList.get(0);
         return pts;
     }
-    
+
     public static Point[] orderPoints(Point[] unordered) {
         List<Point> unorderedList = Arrays.asList(unordered);
         MatOfPoint matrixOfPoints = new MatOfPoint();
         matrixOfPoints.fromList(unorderedList);
         return orderPoints(matrixOfPoints);
     }
-    
-    public static void transformRectangle(Mat imgMatrix, Point[] edges) {
+
+    public static void transformRectangle(Mat imgMatrix, MatOfPoint edges) {
+        Point[] ordEdges = orderPoints(edges);
+        double outWidth = postTransformWidth(ordEdges);
+        double outHeight = postTransformHeight(ordEdges);
+    }
+
+    private static double postTransformWidth(Point[] ordered) {
+        Point topLeft = ordered[0];
+        Point topRight = ordered[1];
+        Point bottomLeft = ordered[2];
+        Point bottomRight = ordered[3];
+
+        double widthTop = Math.sqrt(Math.pow((topRight.x - topLeft.x), 2)
+                + Math.pow((topRight.y - topLeft.y), 2)); // Pythagorean theorem
+        double widthBottom = Math.sqrt(Math.pow((bottomRight.x - bottomLeft.x), 2)
+                + Math.pow((bottomRight.y - bottomLeft.y), 2));
+
+        // width of the transformed image will be
+        // the biggest of 2 parallel rectangle's side (perspective-dependent)
+        return widthTop > widthBottom ? widthTop : widthBottom;
+    }
+
+    private static double postTransformHeight(Point[] ordered) {
+        Point topLeft = ordered[0];
+        Point topRight = ordered[1];
+        Point bottomLeft = ordered[2];
+        Point bottomRight = ordered[3];
         
+        double heightLeft = Math.sqrt(Math.pow((topLeft.x - bottomLeft.x), 2)
+                + Math.pow((topLeft.y - bottomLeft.y), 2));
+        double heightRight = Math.sqrt(Math.pow((topRight.x - bottomRight.x), 2)
+                + Math.pow((topRight.y - bottomRight.y), 2));
+
+        return heightLeft > heightRight ? heightLeft : heightRight;
     }
 }
