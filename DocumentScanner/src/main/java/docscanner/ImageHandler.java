@@ -54,10 +54,10 @@ public class ImageHandler {
         imgCodecs.imwrite(file.getAbsolutePath(), imageMatrix);
     }
 
-    public static List<MatOfPoint> largestContours(Mat img) {
+    public static List<MatOfPoint> largestContours(Mat canny) {
         List<MatOfPoint> contours = new ArrayList<>();
         Mat ranking = new Mat();
-        Imgproc.findContours(img, contours, ranking,
+        Imgproc.findContours(canny, contours, ranking,
                 Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
         // sort: biggest area first
         contours.sort((c1, c2) -> {
@@ -66,6 +66,18 @@ public class ImageHandler {
         });
         return contours.subList(0, 5);
     }
+    
+    private static MatOfPoint2f convertTo2f(MatOfPoint mat) {
+        MatOfPoint2f mat2f = new MatOfPoint2f();
+        mat.convertTo(mat2f, CvType.CV_32F);
+        return mat2f;
+    }
+    
+    private static MatOfPoint convertTo0f(MatOfPoint2f mat) {
+        MatOfPoint mat0f = new MatOfPoint();
+        mat.convertTo(mat0f, CvType.CV_32S);
+        return mat0f;
+    }
 
     public static MatOfPoint documentContour(List<MatOfPoint> contours) {
         MatOfPoint2f documentCnt = null;
@@ -73,8 +85,7 @@ public class ImageHandler {
         for (var cont : contours) {
             // getting MOP2f because the latter 'arcLength' method works only
             // with 2f type
-            MatOfPoint2f cont2f = new MatOfPoint2f();
-            cont.convertTo(cont2f, CvType.CV_32F);
+            MatOfPoint2f cont2f = convertTo2f(cont);
 
             // approximate contour
             double perimeter = Imgproc.arcLength(cont2f, true);
@@ -89,7 +100,7 @@ public class ImageHandler {
         // lastly convert MOP2f back to MOP
         MatOfPoint docMOP = new MatOfPoint();
         try {
-            documentCnt.convertTo(docMOP, CvType.CV_32S);
+            docMOP = convertTo0f(documentCnt);
         } catch (NullPointerException e) {
             System.out.println("ERROR: Did not detect document on the picture.");
             docMOP = null;
@@ -105,10 +116,10 @@ public class ImageHandler {
                 -1, new Scalar(0, 255, 0), 2);
     }
 
-    public static MatOfPoint orderPoints(MatOfPoint unorderedContour) {
+    private static MatOfPoint orderPoints(MatOfPoint unorderedContour) {
         // contour needs to have precisely FOUR points
         List<Point> fourPointList = unorderedContour.toList();
-        
+
         List<Point> ptsOrd = new ArrayList<>(List.of(new Point(), new Point(),
                 new Point(), new Point()));
         // sorting contour's points by their distance from x, y 0 point
@@ -137,22 +148,23 @@ public class ImageHandler {
         return dstMat;
     }
 
-    public static void transformRectangle(Mat imgMatrix, MatOfPoint unordered) {
-        MatOfPoint ordered = orderPoints(unordered);
-        double[][] xyEdges = new double[4][2];
+    public static Mat transformRectangle(Mat imgMatrix, MatOfPoint contour) {
+        MatOfPoint ordered = orderPoints(contour);
 
         double outWidth = postTransformWidth(ordered);
         double outHeight = postTransformHeight(ordered);
 
-        //double[] newTLPointPos = {0, 0};
-        //double[] newTRPointPos = {outWidth, 0};
-        //double[] newBLPointPos = {0, outHeight};
-        //double[] newBRPointPos = {outWidth, outHeight};
-        
-        Mat perspective = Imgproc.getPerspectiveTransform(unordered, ordered);
+        MatOfPoint2f dst = new MatOfPoint2f(
+                new Point(0, 0),
+                new Point(outWidth - 1, 0),
+                new Point(0, outHeight - 1),
+                new Point(outWidth - 1, outHeight - 1));
+
+        Mat perspective = Imgproc.getPerspectiveTransform(ordered, dst);
         Mat warped = new Mat();
         Imgproc.warpPerspective(imgMatrix, warped, perspective,
                 new Size(outWidth, outHeight));
+        return warped;
     }
 
     private static double postTransformWidth(MatOfPoint ordered) {

@@ -3,9 +3,6 @@ package docscanner;
 import nu.pattern.OpenCV;
 import org.opencv.core.Mat;
 import static java.io.File.separator;
-import java.util.List;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 
 public class DocumentScanner {
 
@@ -17,7 +14,24 @@ public class DocumentScanner {
     }
 
     public static void main(String[] args) {
+        String imgName = "receipt.jpg";
         
+        // get canny
+        Mat src = ImageHandler.loadImage(imgName);
+        Mat canny = ImageHandler.cannyEdgeProcess(src);
+        ImageHandler.saveImage(canny, "canny-receipt.jpg");
+        
+        // get document's contour
+        var bigCnts = ImageHandler.largestContours(canny);
+        var docCnt = ImageHandler.documentContour(bigCnts);
+        
+        // draw a border along the doc's countour
+        // ImageHandler.drawBorder(src, docCnt);
+        // ImageHandler.saveImage(src, "contour-selected.jpg");
+        
+        // transform perspective -> get bird's eye view
+        Mat transformed = ImageHandler.transformRectangle(src, docCnt);
+        ImageHandler.saveImage(transformed, "transf-receipt.jpg");
     }
 }
 
@@ -25,4 +39,4 @@ public class DocumentScanner {
 -   work on the "documentContour" alghoritm. It does not detect imperfect
     images. When the contour's is not totally smooth, then most likely
     it won't work. Maybe SMOOTHEN the image/all contours further?
-*/
+ */
