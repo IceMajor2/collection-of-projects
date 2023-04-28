@@ -1,8 +1,8 @@
 package docscanner;
 
 import static docscanner.DocumentScanner.RESOURCES_PATH;
-import java.io.File;
 import static java.io.File.separator;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -105,9 +105,9 @@ public class ImageHandler {
                 -1, new Scalar(0, 255, 0), 2);
     }
 
-    public static Point[] orderPoints(MatOfPoint unordered) {
+    public static MatOfPoint orderPoints(MatOfPoint unordered) {
         // contour needs to have precisely FOUR points
-        Point[] pts = new Point[4];
+        List<Point> ptsOrd = new ArrayList<>();
         var fourPointList = unordered.toList();
         // sorting contour's points by their distance from x, y 0 point
         // biggest distance is first
@@ -116,8 +116,8 @@ public class ImageHandler {
             double xySum02 = p2.x + p2.y;
             return Double.valueOf(xySum02).compareTo(xySum01);
         });
-        pts[0] = fourPointList.get(3); // top-left point (x + y is smallest)
-        pts[3] = fourPointList.get(0); // bottom-right point (x + y is largest)
+        ptsOrd.set(0, fourPointList.get(3)); // top-left point (x + y is smallest)
+        ptsOrd.set(3, fourPointList.get(0)); // bottom-right point (x + y is largest)
 
         // same as previously, but now calculating the diff between x and y
         fourPointList.sort((p1, p2) -> {
@@ -125,29 +125,40 @@ public class ImageHandler {
             double xyDiff02 = p2.x - p2.y;
             return Double.valueOf(xyDiff02).compareTo(xyDiff01);
         });
-        pts[1] = fourPointList.get(3);
-        pts[2] = fourPointList.get(0);
-        return pts;
+        ptsOrd.set(1, fourPointList.get(3));
+        ptsOrd.set(2, fourPointList.get(0));
+
+        // creating a to-return MatOfPoint
+        MatOfPoint dstMat = new MatOfPoint();
+        // adding in-order points to matrix
+        dstMat.fromList(ptsOrd);
+        return dstMat;
     }
 
-    public static Point[] orderPoints(Point[] unordered) {
-        List<Point> unorderedList = Arrays.asList(unordered);
-        MatOfPoint matrixOfPoints = new MatOfPoint();
-        matrixOfPoints.fromList(unorderedList);
-        return orderPoints(matrixOfPoints);
+    public static void transformRectangle(Mat imgMatrix, MatOfPoint unordEdges) {
+        MatOfPoint orderedEdges = orderPoints(unordEdges);
+        double[][] xyEdges = new double[4][2];
+        for (int i = 0; i < 4; i++) {
+            Point edge = orderedEdges.toList().get(i);
+            xyEdges[i][0] = edge.x;
+            xyEdges[i][1] = edge.y;
+        }
+
+        double outWidth = postTransformWidth(orderedEdges);
+        double outHeight = postTransformHeight(orderedEdges);
+
+        //double[] newTLPointPos = {0, 0};
+        //double[] newTRPointPos = {outWidth, 0};
+        //double[] newBLPointPos = {0, outHeight};
+        //double[] newBRPointPos = {outWidth, outHeight};
+        
     }
 
-    public static void transformRectangle(Mat imgMatrix, MatOfPoint edges) {
-        Point[] ordEdges = orderPoints(edges);
-        double outWidth = postTransformWidth(ordEdges);
-        double outHeight = postTransformHeight(ordEdges);
-    }
-
-    private static double postTransformWidth(Point[] ordered) {
-        Point topLeft = ordered[0];
-        Point topRight = ordered[1];
-        Point bottomLeft = ordered[2];
-        Point bottomRight = ordered[3];
+    private static double postTransformWidth(MatOfPoint ordered) {
+        Point topLeft = ordered.toList().get(0);
+        Point topRight = ordered.toList().get(1);
+        Point bottomLeft = ordered.toList().get(2);
+        Point bottomRight = ordered.toList().get(3);
 
         double widthTop = Math.sqrt(Math.pow((topRight.x - topLeft.x), 2)
                 + Math.pow((topRight.y - topLeft.y), 2)); // Pythagorean theorem
@@ -159,12 +170,12 @@ public class ImageHandler {
         return widthTop > widthBottom ? widthTop : widthBottom;
     }
 
-    private static double postTransformHeight(Point[] ordered) {
-        Point topLeft = ordered[0];
-        Point topRight = ordered[1];
-        Point bottomLeft = ordered[2];
-        Point bottomRight = ordered[3];
-        
+    private static double postTransformHeight(MatOfPoint ordered) {
+        Point topLeft = ordered.toList().get(0);
+        Point topRight = ordered.toList().get(1);
+        Point bottomLeft = ordered.toList().get(2);
+        Point bottomRight = ordered.toList().get(3);
+
         double heightLeft = Math.sqrt(Math.pow((topLeft.x - bottomLeft.x), 2)
                 + Math.pow((topLeft.y - bottomLeft.y), 2));
         double heightRight = Math.sqrt(Math.pow((topRight.x - bottomRight.x), 2)
