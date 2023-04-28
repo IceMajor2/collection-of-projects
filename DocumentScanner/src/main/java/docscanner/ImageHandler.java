@@ -105,10 +105,12 @@ public class ImageHandler {
                 -1, new Scalar(0, 255, 0), 2);
     }
 
-    public static MatOfPoint orderPoints(MatOfPoint unordered) {
+    public static MatOfPoint orderPoints(MatOfPoint unorderedContour) {
         // contour needs to have precisely FOUR points
-        List<Point> ptsOrd = new ArrayList<>();
-        var fourPointList = unordered.toList();
+        List<Point> fourPointList = unorderedContour.toList();
+        
+        List<Point> ptsOrd = new ArrayList<>(List.of(new Point(), new Point(),
+                new Point(), new Point()));
         // sorting contour's points by their distance from x, y 0 point
         // biggest distance is first
         fourPointList.sort((p1, p2) -> {
@@ -123,7 +125,7 @@ public class ImageHandler {
         fourPointList.sort((p1, p2) -> {
             double xyDiff01 = p1.x - p1.y;
             double xyDiff02 = p2.x - p2.y;
-            return Double.valueOf(xyDiff02).compareTo(xyDiff01);
+            return Double.valueOf(xyDiff01).compareTo(xyDiff02);
         });
         ptsOrd.set(1, fourPointList.get(3));
         ptsOrd.set(2, fourPointList.get(0));
@@ -135,23 +137,22 @@ public class ImageHandler {
         return dstMat;
     }
 
-    public static void transformRectangle(Mat imgMatrix, MatOfPoint unordEdges) {
-        MatOfPoint orderedEdges = orderPoints(unordEdges);
+    public static void transformRectangle(Mat imgMatrix, MatOfPoint unordered) {
+        MatOfPoint ordered = orderPoints(unordered);
         double[][] xyEdges = new double[4][2];
-        for (int i = 0; i < 4; i++) {
-            Point edge = orderedEdges.toList().get(i);
-            xyEdges[i][0] = edge.x;
-            xyEdges[i][1] = edge.y;
-        }
 
-        double outWidth = postTransformWidth(orderedEdges);
-        double outHeight = postTransformHeight(orderedEdges);
+        double outWidth = postTransformWidth(ordered);
+        double outHeight = postTransformHeight(ordered);
 
         //double[] newTLPointPos = {0, 0};
         //double[] newTRPointPos = {outWidth, 0};
         //double[] newBLPointPos = {0, outHeight};
         //double[] newBRPointPos = {outWidth, outHeight};
         
+        Mat perspective = Imgproc.getPerspectiveTransform(unordered, ordered);
+        Mat warped = new Mat();
+        Imgproc.warpPerspective(imgMatrix, warped, perspective,
+                new Size(outWidth, outHeight));
     }
 
     private static double postTransformWidth(MatOfPoint ordered) {
