@@ -4,7 +4,6 @@ import static docscanner.DocumentScanner.RESOURCES_PATH;
 import static java.io.File.separator;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -150,17 +149,18 @@ public class ImageHandler {
 
     public static Mat transformRectangle(Mat imgMatrix, MatOfPoint contour) {
         MatOfPoint ordered = orderPoints(contour);
+        MatOfPoint2f ordered2f = convertTo2f(ordered);
 
         double outWidth = postTransformWidth(ordered);
         double outHeight = postTransformHeight(ordered);
 
-        MatOfPoint2f dst = new MatOfPoint2f(
+        MatOfPoint2f dst2f = new MatOfPoint2f(
                 new Point(0, 0),
                 new Point(outWidth - 1, 0),
                 new Point(0, outHeight - 1),
                 new Point(outWidth - 1, outHeight - 1));
 
-        Mat perspective = Imgproc.getPerspectiveTransform(ordered, dst);
+        Mat perspective = Imgproc.getPerspectiveTransform(ordered2f, dst2f);
         Mat warped = new Mat();
         Imgproc.warpPerspective(imgMatrix, warped, perspective,
                 new Size(outWidth, outHeight));
