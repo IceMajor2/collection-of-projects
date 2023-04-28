@@ -9,6 +9,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -78,7 +79,7 @@ public class ImageHandler {
             double perimeter = Imgproc.arcLength(cont2f, true);
             MatOfPoint2f approxCnt = new MatOfPoint2f();
             Imgproc.approxPolyDP(cont2f, approxCnt, 0.02 * perimeter, true);
-            
+
             if(approxCnt.toList().size() == 4) {
                 documentCnt = approxCnt;
                 break;
@@ -90,6 +91,7 @@ public class ImageHandler {
             documentCnt.convertTo(docMOP, CvType.CV_32S);
         } catch(NullPointerException e) {
             System.out.println("ERROR: Did not detect document on the picture.");
+            docMOP = null;
         }
         return docMOP;
     }
@@ -100,5 +102,30 @@ public class ImageHandler {
         
         Imgproc.drawContours(img, List.of(contour),
                 -1, new Scalar(0, 255, 0), 2);
+    }
+    
+    public static Point[] orderPoints(MatOfPoint contour) {
+        // contour needs to have precisely FOUR points
+        Point[] pts = new Point[4];
+        var fourPointList = contour.toList();
+        // sorting contour's points by their distance from x, y 0 point
+        // biggest distance is first
+        fourPointList.sort((p1, p2) -> {
+            double xySum01 = p1.x + p1.y;
+            double xySum02 = p2.x + p2.y;
+            return Double.valueOf(xySum02).compareTo(xySum01);
+        });
+        pts[0] = fourPointList.get(3); // top-left point (x + y is smallest)
+        pts[3] = fourPointList.get(0); // bottom-right point (x + y is largest)
+        
+        // same as previously, but now calculating the diff between x and y
+        fourPointList.sort((p1, p2) -> {
+            double xyDiff01 = p1.x - p1.y;
+            double xyDiff02 = p2.x - p2.y;
+            return Double.valueOf(xyDiff02).compareTo(xyDiff01);
+        });
+        pts[1] = fourPointList.get(3);
+        pts[2] = fourPointList.get(0);
+        return pts;
     }
 }

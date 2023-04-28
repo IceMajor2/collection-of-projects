@@ -15,13 +15,17 @@ public class DocumentScanner {
 
     public static void main(String[] args) {
         //Scanner scanner = new Scanner(System.in);
-        String image = "receipt2.png"; //scanner.nextLine();
+        String image = "receipt.jpg"; //scanner.nextLine();
 
         Mat imgMatrix = ImageHandler.loadImage(image);
         Mat cannied = ImageHandler.cannyEdgeProcess(imgMatrix);
         var largestContours = ImageHandler.largestContours(cannied);
+
         var documentCnt = ImageHandler.documentContour(largestContours);
-        ImageHandler.drawBorder(imgMatrix, documentCnt);
+        if (documentCnt != null) {
+            ImageHandler.drawBorder(imgMatrix, documentCnt);
+        }
         ImageHandler.saveImage(imgMatrix, image);
+        ImageHandler.saveImage(cannied, "receipt-cannied.jpg");
     }
 }
