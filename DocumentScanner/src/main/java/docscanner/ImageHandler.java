@@ -31,24 +31,25 @@ public class ImageHandler {
 
     private static Mat toCannyEdge(Mat img) {
         Mat canny = new Mat(img.rows(), img.cols(), img.type());
-        Imgproc.Canny(img, canny, 75, 200);
+        Imgproc.Canny(img, canny, 55, 200);
         return canny;
     }
 
     public static Mat blackAndWhiteFeel(Mat src) {
         Mat blAndWh = new Mat(src.rows(), src.cols(), src.type());
         Imgproc.adaptiveThreshold(src, blAndWh, 255,
-                Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
-                9, 10);
+                Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY,
+                31, 10);
         return blAndWh;
         // ​(Mat src, Mat dst, double maxValue, int adaptiveMethod,
         // int thresholdType, int blockSize, double C)
     }
 
     public static Mat cannyEdgeProcess(Mat img) {
-        Mat edges = toGreyScale(img);
-        edges = removeNoise(edges);
-        return toCannyEdge(edges);
+        Mat canny = toGreyScale(img);
+        canny = removeNoise(canny);
+        canny = toCannyEdge(canny);
+        return makeSureContoursClosed(canny);
     }
 
     public static Mat loadImage(String imgName) {
@@ -63,7 +64,15 @@ public class ImageHandler {
         imgCodecs.imwrite(file.getAbsolutePath(), imageMatrix);
     }
 
+    private static Mat makeSureContoursClosed(Mat canny) {
+        var kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(9, 9));
+        Mat dilated = new Mat(canny.rows(), canny.cols(), canny.type());
+        Imgproc.dilate(canny, dilated, kernel);
+        return dilated;
+    }
+
     public static List<MatOfPoint> largestContours(Mat canny) {
+
         List<MatOfPoint> contours = new ArrayList<>();
         Mat ranking = new Mat();
         Imgproc.findContours(canny, contours, ranking,
@@ -142,13 +151,35 @@ public class ImageHandler {
         ptsOrd.set(3, fourPointList.get(0)); // bottom-right point (x + y is largest)
 
         // same as previously, but now calculating the diff between x and y
-        fourPointList.sort((p1, p2) -> {
-            double xyDiff01 = p1.x - p1.y;
-            double xyDiff02 = p2.x - p2.y;
-            return Double.valueOf(xyDiff01).compareTo(xyDiff02);
-        });
-        ptsOrd.set(1, fourPointList.get(3));
-        ptsOrd.set(2, fourPointList.get(0));
+        // fourPointList.sort((p1, p2) -> {
+        //    double xyDiff01 = p1.x - p1.y;
+        //    double xyDiff02 = p2.x - p2.y;
+        //    return Double.valueOf(xyDiff01).compareTo(xyDiff02);
+        //});
+        
+        //ptsOrd.set(1, fourPointList.get(3));
+        //ptsOrd.set(2, fourPointList.get(0));
+        
+        Point p1 = null;
+        Point p2 = null;
+        for(Point pt : unorderedContour.toList()) {
+            if(ptsOrd.contains(pt)) {
+                continue;
+            }
+            if(p1 == null) {
+                p1 = pt;
+                continue;
+            }
+            p2 = pt;
+        }
+        
+        if(p1.x > p2.x && p1.y < p2.y) {
+            ptsOrd.set(1, p2);
+            ptsOrd.set(2, p1);
+        } else {
+            ptsOrd.set(1, p1);
+            ptsOrd.set(2, p2);
+        }
 
         // creating a to-return MatOfPoint
         MatOfPoint dstMat = new MatOfPoint();

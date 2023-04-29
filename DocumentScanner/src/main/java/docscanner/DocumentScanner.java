@@ -14,24 +14,23 @@ public class DocumentScanner {
     }
 
     public static void main(String[] args) {
-        String imgName = "receipt.jpg";
+        String imgName = "chall3.jpg";
         
         // get canny
         Mat src = ImageHandler.loadImage(imgName);
         Mat canny = ImageHandler.cannyEdgeProcess(src);
-        //ImageHandler.saveImage(canny, "chall3.jpg");
         
         // get document's contour
         var bigCnts = ImageHandler.largestContours(canny);
         var docCnt = ImageHandler.documentContour(bigCnts);
-        
+
         if(docCnt == null) {
             return;
         }
         
         // draw a border along the doc's countour
-        // ImageHandler.drawBorder(src, docCnt);
-        // ImageHandler.saveImage(src, "contour-selected.jpg");
+         ImageHandler.drawBorder(src, docCnt);
+         ImageHandler.saveImage(src, "contour-selected.jpg");
         
         // transform perspective -> get bird's eye view
         Mat transformed = ImageHandler.transformRectangle(src, docCnt);
@@ -44,7 +43,5 @@ public class DocumentScanner {
 }
 
 /* TODO:
--   work on the "documentContour" alghoritm. It does not detect imperfect
-    images. When the contour's is not totally smooth, then most likely
-    it won't work. Maybe SMOOTHEN the image/all contours further?
+-   fix edge detection (precisely: top-right and bottom-left)
  */
