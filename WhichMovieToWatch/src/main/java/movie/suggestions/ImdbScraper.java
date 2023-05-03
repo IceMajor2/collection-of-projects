@@ -31,8 +31,8 @@ public class ImdbScraper {
             
             // if the movie has been already parsed, then skip another parse
             // by just getting info from DB
-            if(Database.allMovies.containsKey(title)) {
-                Movie mov = Database.allMovies.get(title);
+            if(Database.containsMovie(title)) {
+                Movie mov = Database.getMovie(title);
                 everPopular.add(mov);
                 break;
             }
@@ -47,6 +47,7 @@ public class ImdbScraper {
             
             Movie mov = new Movie(title, year, rating, votes);
             everPopular.add(mov);
+            Database.addMovie(mov);
             
             count++;
         }
