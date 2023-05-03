@@ -45,4 +45,8 @@ public class Movie {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public String toString() {
+        return "%s (%d): %.1f - %d votes".formatted(name, year, rating, votes);
+    }
 }

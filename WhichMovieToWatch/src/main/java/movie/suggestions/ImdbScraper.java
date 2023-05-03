@@ -12,7 +12,7 @@ import org.jsoup.select.Elements;
 
 public class ImdbScraper {
 
-    public static void allTimePopular() throws IOException {
+    public static List<Movie> allTimePopular() throws IOException {
         // store movies in Map
         List<Movie> everPopular = new ArrayList<>();
 
@@ -43,13 +43,14 @@ public class ImdbScraper {
 
             int year = yearToInt(yearStr);
             double rating = Double.valueOf(ratingStr);
-            int votes = Integer.valueOf(votesStr);
+            int votes = removeCommasFromVotes(votesStr);
             
             Movie mov = new Movie(title, year, rating, votes);
             everPopular.add(mov);
             
             count++;
         }
+        return everPopular;
     }
     
     private static int yearToInt(String extractedYr) {
@@ -66,5 +67,16 @@ public class ImdbScraper {
         
         String yearStr = extractedYr.substring(indexOfDigit, indexOfDigit + 4);
         return Integer.valueOf(yearStr);
+    }
+    
+    private static int removeCommasFromVotes(String votesStr) {
+        StringBuilder sb = new StringBuilder("");
+        for(char ch : votesStr.toCharArray()) {
+            if(ch == ',') {
+                continue;
+            }
+            sb.append(ch);
+        }
+        return Integer.valueOf(sb.toString());
     }
 }
