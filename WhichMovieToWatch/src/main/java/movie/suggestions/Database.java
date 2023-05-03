@@ -19,4 +19,8 @@ public class Database {
         String title = movie.getName();
         allMovies.put(title, movie);
     }
+
+    public static Map<String, Movie> getAllMovies() {
+        return allMovies;
+    }
 }

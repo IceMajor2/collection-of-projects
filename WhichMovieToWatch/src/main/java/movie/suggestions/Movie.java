@@ -46,6 +46,7 @@ public class Movie {
         this.name = name;
     }
     
+    @Override
     public String toString() {
         return "%s (%d): %.1f - %d votes".formatted(name, year, rating, votes);
     }
