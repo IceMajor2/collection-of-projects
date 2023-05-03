@@ -69,6 +69,12 @@ public class UserInterface {
     }
 
     private void yearPopularMenu() {
+        int year = askForYear();
+        printYearPopular(year);
+    }
+
+    private int askForYear() {
+        int year = -1;
         while (true) {
             System.out.print("Input year: ");
 
@@ -78,9 +84,25 @@ public class UserInterface {
                 continue;
             }
 
-            int year = Integer.valueOf(input);
-            printYearPopular(year);
+            year = Integer.valueOf(input);
+            break;
         }
+        return year;
+    }
+
+    private void yearBestMenu() {
+        int year = askForYear();
+        printYearPopular(year);
+    }
+
+    private void printYearBest(int year) {
+        List<Movie> movies = null;
+        try {
+            movies = ImdbScraper.yearBest(year);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        printMovieList(movies);
     }
 
     private void printYearPopular(int year) {
