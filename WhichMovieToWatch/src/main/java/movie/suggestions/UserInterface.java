@@ -37,7 +37,7 @@ public class UserInterface {
                 continue;
             }
             if ("3".equals(input)) {
-                yearPopular();
+                yearPopularMenu();
                 continue;
             }
             if ("-".equals(input)) {
@@ -55,12 +55,7 @@ public class UserInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        int pos = 1;
-        for (Movie mov : movies) {
-            System.out.println("%d. %s".formatted(pos, mov.toString()));
-            pos++;
-        }
+        printMovieList(movies);
     }
 
     private void printAllTimeBest() {
@@ -70,7 +65,35 @@ public class UserInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        printMovieList(movies);
+    }
 
+    private void yearPopularMenu() {
+        while (true) {
+            System.out.print("Input year: ");
+
+            String input = scanner.nextLine();
+            if (!isYearValid(input)) {
+                System.out.println("ERROR! Input valid year.");
+                continue;
+            }
+
+            int year = Integer.valueOf(input);
+            printYearPopular(year);
+        }
+    }
+
+    private void printYearPopular(int year) {
+        List<Movie> movies = null;
+        try {
+            movies = ImdbScraper.yearPopular(year);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        printMovieList(movies);
+    }
+
+    private void printMovieList(List<Movie> movies) {
         int pos = 1;
         for (Movie mov : movies) {
             System.out.println("%d. %s".formatted(pos, mov.toString()));
@@ -78,29 +101,15 @@ public class UserInterface {
         }
     }
 
-    private void yearPopular() {
-        while (true) {
-            System.out.print("Input year: ");
-            
-            String input = scanner.nextLine();
-            if(!isYearValid(input)) {
-                System.out.println("ERROR! Input valid year.");
-                continue;
-            }
-            
-            int year = Integer.valueOf(input);
-        }
-    }
-    
     private boolean isYearValid(String input) {
         try {
             int year = Integer.valueOf(input);
-            
-            if(input.length() != 4) {
+
+            if (input.length() != 4) {
                 return false;
             }
             return true;
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     }
