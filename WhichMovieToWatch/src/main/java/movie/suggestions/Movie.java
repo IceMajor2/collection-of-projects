@@ -4,10 +4,10 @@ public class Movie {
     
     private String name;
     private int year;
-    private int rating;
+    private double rating;
     private int votes;
     
-    public Movie(String name, int year, int rating, int votes) {
+    public Movie(String name, int year, double rating, int votes) {
         this.name = name;
         this.year = year;
         this.rating = rating;
@@ -26,7 +26,7 @@ public class Movie {
         return votes;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 
@@ -38,7 +38,7 @@ public class Movie {
         this.votes = votes;
     }
 
-    public void setRating(int rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
