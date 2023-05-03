@@ -118,36 +118,17 @@ public class ImdbScraper {
     }
     
     public static List<Movie> yearBest(int year) throws IOException {
-        List<Movie> yearPop = new ArrayList<>();
-        
+        return null;
+    }
+    
+    // determines the lower bound of votes for a given year
+    // for movies to be considered in the "best of" category
+    private static int calculateVotesBoundOfYear(int year) throws IOException {
         String url = "https://www.imdb.com/search/title/?title_type=feature&release_date=%d&sort=num_votes,desc".formatted(year);
-        Elements moviesInfo = getMoviesGrid(url);
+        Element lastIn50 = getMoviesGrid(url).last();
         
-        int count = 0;
-        for (Element movie : moviesInfo) {
-            
-            if (count == 20) {
-                break;
-            }
-            
-            String title = parseTitle(movie);
-            
-            if(Database.containsMovie(title)) {
-                Movie mov = Database.getMovie(title);
-                yearPop.add(mov);
-                continue;
-            }
-            
-            double rating = parseRating(movie);
-            int votes = parseVotes(movie);
-            
-            Movie mov = new Movie(title, year, rating, votes);
-            yearPop.add(mov);
-            Database.addMovie(mov);
-
-            count++;
-        }
-        return yearPop;
+        int votes = parseVotes(lastIn50);
+        return (int) (votes / 1.5);
     }
 
     private static int parseYear(Element movie) {
