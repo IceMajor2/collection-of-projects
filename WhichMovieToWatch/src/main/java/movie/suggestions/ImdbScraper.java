@@ -1,6 +1,7 @@
 package movie.suggestions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ public class ImdbScraper {
 
     public static void allTimePopular() throws IOException {
         // store movies in Map
-        Map<Integer, List<Movie>> everPopular = new HashMap<>();
+        List<Movie> everPopular = new ArrayList<>();
 
         // get HTML parsed
         String url = "https://www.imdb.com/search/title/?title_type=feature&sort=num_votes,desc";
@@ -27,12 +28,26 @@ public class ImdbScraper {
             }
             Elements header = movie.select("h3");
             String title = header.select("a[href]").first().text();
+            
+            // if the movie has been already parsed, then skip another parse
+            // by just getting info from DB
+            if(Database.allMovies.containsKey(title)) {
+                Movie mov = Database.allMovies.get(title);
+                everPopular.add(mov);
+                break;
+            }
+            
             String yearStr = header.select("span.lister-item-year.text-muted.unbold").first().text();
-            int year = yearToInt(yearStr);
             String ratingStr = movie.select("[name='ir']").first().text();
-            double rating = Double.valueOf(ratingStr);
             String votesStr = movie.select("[name='nv']").first().text();
+
+            int year = yearToInt(yearStr);
+            double rating = Double.valueOf(ratingStr);
             int votes = Integer.valueOf(votesStr);
+            
+            Movie mov = new Movie(title, year, rating, votes);
+            everPopular.add(mov);
+            
             count++;
         }
     }

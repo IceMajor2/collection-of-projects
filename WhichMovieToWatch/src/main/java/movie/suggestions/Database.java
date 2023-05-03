@@ -1,10 +1,10 @@
 package movie.suggestions;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Database {
     
-    private Map<Integer, List<Movie>> allMovies;
+    public static Map<String, Movie> allMovies = new HashMap<>();
     
 }
