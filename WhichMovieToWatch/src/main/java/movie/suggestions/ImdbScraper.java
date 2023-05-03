@@ -86,8 +86,34 @@ public class ImdbScraper {
     
     public static List<Movie> yearPopular(int year) throws IOException {
         List<Movie> yearPop = new ArrayList<>();
+        
         String url = "https://www.imdb.com/search/title/?title_type=feature&release_date=%d&sort=num_votes,desc".formatted(year);
         Elements moviesInfo = getMoviesGrid(url);
+        
+        int count = 0;
+        for (Element movie : moviesInfo) {
+            
+            if (count == 50) {
+                break;
+            }
+            
+            String title = parseTitle(movie);
+            
+            if(Database.containsMovie(title)) {
+                Movie mov = Database.getMovie(title);
+                yearPop.add(mov);
+                continue;
+            }
+            
+            double rating = parseRating(movie);
+            int votes = parseVotes(movie);
+            
+            Movie mov = new Movie(title, year, rating, votes);
+            yearPop.add(mov);
+            Database.addMovie(mov);
+
+            count++;
+        }
         return yearPop;
     }
 
