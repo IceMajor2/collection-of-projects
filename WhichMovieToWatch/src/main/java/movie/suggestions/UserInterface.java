@@ -40,6 +40,10 @@ public class UserInterface {
                 yearPopularMenu();
                 continue;
             }
+            if("4".equals(input)) {
+                yearBestMenu();
+                continue;
+            }
             if ("-".equals(input)) {
                 printDatabase();
                 continue;
@@ -72,6 +76,11 @@ public class UserInterface {
         int year = askForYear();
         printYearPopular(year);
     }
+    
+    private void yearBestMenu() {
+        int year = askForYear();
+        printYearBest(year);
+    }
 
     private int askForYear() {
         int year = -1;
@@ -88,11 +97,6 @@ public class UserInterface {
             break;
         }
         return year;
-    }
-
-    private void yearBestMenu() {
-        int year = askForYear();
-        printYearPopular(year);
     }
 
     private void printYearBest(int year) {

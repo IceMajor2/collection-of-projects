@@ -31,6 +31,7 @@ public class ImdbScraper {
             if (Database.containsMovie(title)) {
                 Movie mov = Database.getMovie(title);
                 everPopular.add(mov);
+                count++;
                 continue;
             }
 
@@ -68,6 +69,7 @@ public class ImdbScraper {
             if(Database.containsMovie(title)) {
                 Movie mov = Database.getMovie(title);
                 everBest.add(mov);
+                count++;
                 continue;
             }
             
@@ -102,6 +104,7 @@ public class ImdbScraper {
             if(Database.containsMovie(title)) {
                 Movie mov = Database.getMovie(title);
                 yearPop.add(mov);
+                count++;
                 continue;
             }
             
@@ -137,6 +140,7 @@ public class ImdbScraper {
             if(Database.containsMovie(title)) {
                 Movie mov = Database.getMovie(title);
                 yearBest.add(mov);
+                count++;
                 continue;
             }
             
@@ -159,7 +163,7 @@ public class ImdbScraper {
         Element lastIn50 = getMoviesGrid(url).last();
         
         int votes = parseVotes(lastIn50);
-        return (int) (votes / 1.5);
+        return (int) (votes / 2.5);
     }
 
     private static int parseYear(Element movie) {
