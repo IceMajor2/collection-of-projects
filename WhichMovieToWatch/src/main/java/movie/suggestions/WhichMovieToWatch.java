@@ -10,4 +10,5 @@ public class WhichMovieToWatch {
 /* TODO:
     - votes format to DDD,DDD,DDD
     - print movies in UI should be one method with function as arg
+    - actually: does DB detect already-parsed movie? Do time-test comparisions
 */
