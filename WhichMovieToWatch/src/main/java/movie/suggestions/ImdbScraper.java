@@ -29,6 +29,8 @@ public class ImdbScraper {
             String title = header.select("a[href]").first().text();
             String yearStr = header.select("span.lister-item-year.text-muted.unbold").first().text();
             int year = yearToInt(yearStr);
+            String rating = movie.select("[name='ir']").first().text();
+            System.out.println(rating);
             count++;
         }
     }
