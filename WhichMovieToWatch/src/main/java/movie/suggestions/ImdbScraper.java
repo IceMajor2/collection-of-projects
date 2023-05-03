@@ -31,6 +31,8 @@ public class ImdbScraper {
             int year = yearToInt(yearStr);
             String ratingStr = movie.select("[name='ir']").first().text();
             double rating = Double.valueOf(ratingStr);
+            String votesStr = movie.select("[name='nv']").first().text();
+            int votes = Integer.valueOf(votesStr);
             count++;
         }
     }
