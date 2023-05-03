@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 public class ImdbScraper {
 
     public static List<Movie> allTimePopular() throws IOException {
-        // store movies in Map
+        // store movies in List
         List<Movie> everPopular = new ArrayList<>();
 
         // get HTML parsed
@@ -49,7 +49,7 @@ public class ImdbScraper {
     }
 
     public static List<Movie> allTimeBest() throws IOException {
-        // store movies in Map
+        // store movies in List
         List<Movie> everBest = new ArrayList<>();
 
         // get HTML parsed
@@ -82,6 +82,13 @@ public class ImdbScraper {
             count++;
         }
         return everBest;
+    }
+    
+    public static List<Movie> yearPopular(int year) throws IOException {
+        List<Movie> yearPop = new ArrayList<>();
+        String url = "https://www.imdb.com/search/title/?title_type=feature&release_date=%d&sort=num_votes,desc".formatted(year);
+        Elements moviesInfo = getMoviesGrid(url);
+        return yearPop;
     }
 
     private static int parseYear(Element movie) {

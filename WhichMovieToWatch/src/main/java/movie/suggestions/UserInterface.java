@@ -32,11 +32,15 @@ public class UserInterface {
                 printAllTimePopular();
                 continue;
             }
-            if("2".equals(input)) {
+            if ("2".equals(input)) {
                 printAllTimeBest();
                 continue;
             }
-            if("-".equals(input)) {
+            if ("3".equals(input)) {
+                yearPopular();
+                continue;
+            }
+            if ("-".equals(input)) {
                 printDatabase();
                 continue;
             }
@@ -44,42 +48,69 @@ public class UserInterface {
         }
     }
 
-    public void printAllTimePopular() {
+    private void printAllTimePopular() {
         List<Movie> movies = null;
         try {
             movies = ImdbScraper.allTimePopular();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         int pos = 1;
-        for(Movie mov : movies) {
+        for (Movie mov : movies) {
             System.out.println("%d. %s".formatted(pos, mov.toString()));
             pos++;
         }
     }
-    
-    public void printAllTimeBest() {
+
+    private void printAllTimeBest() {
         List<Movie> movies = null;
         try {
             movies = ImdbScraper.allTimeBest();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         int pos = 1;
-        for(Movie mov : movies) {
+        for (Movie mov : movies) {
             System.out.println("%d. %s".formatted(pos, mov.toString()));
             pos++;
         }
     }
+
+    private void yearPopular() {
+        while (true) {
+            System.out.print("Input year: ");
+            
+            String input = scanner.nextLine();
+            if(!isYearValid(input)) {
+                System.out.println("ERROR! Input valid year.");
+                continue;
+            }
+            
+            int year = Integer.valueOf(input);
+        }
+    }
     
-    public void printDatabase() {
+    private boolean isYearValid(String input) {
+        try {
+            int year = Integer.valueOf(input);
+            
+            if(input.length() != 4) {
+                return false;
+            }
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private void printDatabase() {
         var movies = Database.getAllMovies();
-        
+
         int pos = 1;
         System.out.println("============DATABASE============");
-        for(Movie movie : movies.values()) {
+        for (Movie movie : movies.values()) {
             System.out.println("%d. %s".formatted(pos, movie));
             pos++;
         }
