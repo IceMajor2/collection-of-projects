@@ -36,6 +36,10 @@ public class UserInterface {
                 printAllTimeBest();
                 continue;
             }
+            if("-".equals(input)) {
+                printDatabase();
+                continue;
+            }
             System.out.println("ERROR! Please input a valid number.");
         }
     }
@@ -68,5 +72,17 @@ public class UserInterface {
             System.out.println("%d. %s".formatted(pos, mov.toString()));
             pos++;
         }
+    }
+    
+    public void printDatabase() {
+        var movies = Database.getAllMovies();
+        
+        int pos = 1;
+        System.out.println("============DATABASE============");
+        for(Movie movie : movies.values()) {
+            System.out.println("%d. %s".formatted(pos, movie));
+            pos++;
+        }
+        System.out.println("================================");
     }
 }
