@@ -32,6 +32,10 @@ public class UserInterface {
                 printAllTimePopular();
                 continue;
             }
+            if("2".equals(input)) {
+                printAllTimeBest();
+                continue;
+            }
             System.out.println("ERROR! Please input a valid number.");
         }
     }
@@ -40,6 +44,21 @@ public class UserInterface {
         List<Movie> movies = null;
         try {
             movies = ImdbScraper.allTimePopular();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        int pos = 1;
+        for(Movie mov : movies) {
+            System.out.println("%d. %s".formatted(pos, mov.toString()));
+            pos++;
+        }
+    }
+    
+    public void printAllTimeBest() {
+        List<Movie> movies = null;
+        try {
+            movies = ImdbScraper.allTimeBest();
         } catch (IOException e) {
             e.printStackTrace();
         }

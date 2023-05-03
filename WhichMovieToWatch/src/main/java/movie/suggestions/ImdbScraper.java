@@ -31,7 +31,7 @@ public class ImdbScraper {
             if (Database.containsMovie(title)) {
                 Movie mov = Database.getMovie(title);
                 everPopular.add(mov);
-                break;
+                continue;
             }
 
             // get the rest of movie properties
@@ -58,9 +58,28 @@ public class ImdbScraper {
 
         int count = 0;
         for (Element movie : moviesInfo) {
+            
             if (count == 50) {
                 break;
             }
+            
+            String title = parseTitle(movie);
+            
+            if(Database.containsMovie(title)) {
+                Movie mov = Database.getMovie(title);
+                everBest.add(mov);
+                continue;
+            }
+            
+            int year = parseYear(movie);
+            double rating = parseRating(movie);
+            int votes = parseVotes(movie);
+            
+            Movie mov = new Movie(title, year, rating, votes);
+            everBest.add(mov);
+            Database.addMovie(mov);
+
+            count++;
         }
         return everBest;
     }
