@@ -1,5 +1,6 @@
 package movie.suggestions;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class UserInterface {
@@ -27,6 +28,11 @@ public class UserInterface {
                 break;
             }
             if("1".equals(input)) {
+                try {
+                ImdbScraper.allTimePopular();
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
                 continue;
             }
             System.out.println("ERROR! Please input a valid number.");
