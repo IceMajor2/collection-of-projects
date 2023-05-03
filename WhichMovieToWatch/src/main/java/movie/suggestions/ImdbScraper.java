@@ -27,8 +27,25 @@ public class ImdbScraper {
             }
             Elements header = movie.select("h3");
             String title = header.select("a[href]").first().text();
+            String yearStr = header.select("span.lister-item-year.text-muted.unbold").first().text();
+            int year = yearToInt(yearStr);
             count++;
-            String year = header.select("span.lister-item-year.text-muted.unbold").first().text();
         }
+    }
+    
+    private static int yearToInt(String extractedYr) {
+        int indexOfDigit = -1;
+        
+        int index = 0;
+        for(char ch : extractedYr.toCharArray()) {
+            if(Character.isDigit(ch)) {
+                indexOfDigit = index;
+                break;
+            }
+            index++;
+        }
+        
+        String yearStr = extractedYr.substring(indexOfDigit, indexOfDigit + 4);
+        return Integer.valueOf(yearStr);
     }
 }
