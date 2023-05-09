@@ -9,12 +9,12 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.icemajor</groupId>
-	<artifactId>todolist-web-app</artifactId>
+	<artifactId>web-tasks-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>todolist-web-app</name>
-	<description>Web application for managing your tasks</description>
+	<name>web-tasks-app</name>
+	<description>Web application for managing tasks</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>20</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -50,18 +50,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-                <!-- https://mvnrepository.com/artifact/org.webjars/bootstrap -->
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>3.4.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.webjars/jquery -->
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.6.0</version>
 		</dependency>
 	</dependencies>
 

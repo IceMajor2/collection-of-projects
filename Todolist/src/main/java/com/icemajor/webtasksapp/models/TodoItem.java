@@ -19,11 +19,11 @@ public class TodoItem {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     @Setter
-    private long id;
+    private Long id;
     
     @Getter
     @Setter
-    @NotBlank(message = "What's the task?")
+    @NotBlank(message = "The task is?")
     private String description;
     
     @Getter
@@ -49,7 +49,7 @@ public class TodoItem {
     
     @Override
     public String toString() {
-        return "TodoItem{id=%d, description='%s', complete='%s', createdDate='%s', modifiedDate='%s'}"
-                .formatted(id, description, complete, createdDate, modifiedDate);
+        return String.format("TodoItem{id=%d, description='%s', complete='%s', createdDate='%s', modifiedDate='%s'}",
+                id, description, complete, createdDate, modifiedDate);
     }
 }
