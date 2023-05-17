@@ -1,6 +1,7 @@
-package com.icemajor.photos.clone;
+package com.icemajor.photos.clone.web;
 
-import jakarta.validation.Valid;
+import com.icemajor.photos.clone.model.Photo;
+import com.icemajor.photos.clone.service.PhotosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,6 @@ public class PhotosController {
 
     @PostMapping("/photos")
     public Photo create(@RequestPart("data") MultipartFile file) throws IOException {
-        return photosService.save(file.getOriginalFilename(), file.getBytes());
+        return photosService.save(file.getOriginalFilename(), file.getContentType(), file.getBytes());
     }
 }

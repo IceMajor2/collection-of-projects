@@ -1,5 +1,6 @@
-package com.icemajor.photos.clone;
+package com.icemajor.photos.clone.service;
 
+import com.icemajor.photos.clone.model.Photo;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -18,10 +19,11 @@ public class PhotosService {
         return db.values();
     }
 
-    public Photo save(String fileName, byte[] data) {
+    public Photo save(String fileName, String contentType, byte[] data) {
         Photo photo = new Photo();
         photo.setId(UUID.randomUUID().toString());
         photo.setFileName(fileName);
+        photo.setContentType(contentType);
         photo.setData(data);
         db.put(photo.getId(), photo);
         return photo;
